@@ -4,7 +4,7 @@ var fs = require('fs');
 var path = require('path');
 
 var extendedConfigFilesArray = [
-  '../node_modules/algotech-eslint-rules/src/rules/index.js',
+  '../node_modules/coding-standards-javascript/src/rules/index.js',
 ];
 
 var packageJsonPath = 'package.json';

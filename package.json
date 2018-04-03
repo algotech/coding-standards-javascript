@@ -1,7 +1,7 @@
 {
-  "name": "algotech-eslint-rules",
+  "name": "coding-standards-javascript",
   "version": "1.0.0",
-  "description": "Algotech coding style rules config for eslinter.",
+  "description": "Adds JS conding standards eslinter check on git precommit.",
   "main": "index.js",
   "scripts": {
     "postinstall": "node src/insert-hooks.js",
