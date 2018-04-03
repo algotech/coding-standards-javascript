@@ -4,7 +4,8 @@
   "description": "Algotech coding style rules config for eslinter.",
   "main": "index.js",
   "scripts": {
-    "postinstall": "node src/insert-hooks.js"
+    "postinstall": "node src/insert-hooks.js",
+    "preuninstall": "node src/remove-hooks.js"
   },
   "author": "rares.oroian@algotech.solutions",
   "license": "ISC",

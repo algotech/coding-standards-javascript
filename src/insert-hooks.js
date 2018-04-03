@@ -1,36 +1,37 @@
 (function insertHooks() {
+  'use strict';
+
   var fs = require('fs');
   var path = require('path');
+  var config = require('./config.js');
 
-  var rootProjectPackageJsonPath = '../../package.json';
-  var localEslintrcPath = 'src/algotech-eslintrc.js';
-  var rootProjectEslintFilePath = '../../.git/algotech-eslintrc.js';
+  var paths = config.paths;
 
   if (
-    !validateFileExists(rootProjectPackageJsonPath, 'package.json') ||
-    !validateFileExists(localEslintrcPath, 'src/algotech-eslintrc.js')
+    !validateFileExists(paths.rootProject.packageJson, 'package.json') ||
+    !validateFileExists(paths.localProject.eslintrc, 'algotech-eslintrc.js')
   ) {
     return;
   }
 
-  var rootPackageJson = readFileToObject(rootProjectPackageJsonPath);
-  var localEslintrcStr = fs.readFileSync(localEslintrcPath);
+  var rootPackageJson = readFileToObject(paths.rootProject.packageJson);
+  var localEslintrcStr = fs.readFileSync(paths.localProject.eslintrc);
 
-  updateRootPackageJson(rootPackageJson);
+  configurePrecommitHookInPackageJson(rootPackageJson);
 
   var stringifiedRootPackage = JSON.stringify(rootPackageJson, null, 2);
 
-  fs.writeFileSync(rootProjectPackageJsonPath, stringifiedRootPackage);
-  fs.writeFileSync(rootProjectEslintFilePath, localEslintrcStr);
+  fs.writeFileSync(paths.rootProject.packageJson, stringifiedRootPackage);
+  fs.writeFileSync(paths.rootProject.eslintrc, localEslintrcStr);
 
   function validateFileExists(path, filename) {
     var exists = fs.existsSync(path);
 
     if (!exists) {
       console.log(
-        'ERR: Could not find root project',
+        'ERR: Could not find project file:',
         filename,
-        'file.Tested path:',
+        'At path:',
         path
       );
     }
@@ -38,13 +39,16 @@
     return exists;
   }
 
-  function updateRootPackageJson(rootPackageJson) {
+  function configurePrecommitHookInPackageJson(rootPackageJson) {
+    // add precommit script
     rootPackageJson.scripts = mergeObjects(
       rootPackageJson.scripts,
       {
         "precommit": "lint-staged"
       }
     );
+
+    // add lint-staged config
     rootPackageJson['lint-staged'] = mergeObjects(
       rootPackageJson['lint-staged'],
       {
@@ -53,7 +57,10 @@
         ]
       }
     );
-    rootPackageJson['eslintrc-path'] =  rootPackageJson['eslintrc-path'] || '';
+
+    // add empty field for developer to specify his own .eslintrc
+    rootPackageJson[config.fields.eslintrcPath] =
+      rootPackageJson[config.fields.eslintrcPath] || '';
   }
 
   function readFileToObject(path) {
@@ -92,5 +99,4 @@
 
     return mergeResult;
   }
-
 })();
